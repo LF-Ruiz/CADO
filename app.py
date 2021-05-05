@@ -64,30 +64,37 @@ columns =
     '04', '05', '06', '07', '08', '09', '10', '11', '12'
 
 'total_volume', 'year', 'Atlanta', 'Baltimore/Washington', 'Boise',
-       'Boston', 'Buffalo/Rochester', 'California', 'Charlotte', 'Chicago',
-       'Cincinnati/Dayton', 'Columbus', 'Dallas/Ft. Worth', 'Denver',
-       'Detroit', 'Grand Rapids', 'Great Lakes', 'Harrisburg/Scranton',
-       'Hartford/Springfield', 'Houston', 'Indianapolis', 'Jacksonville',
-       'Las Vegas', 'Los Angeles', 'Louisville', 'Miami/Ft. Lauderdale',
-       'Midsouth', 'Nashville', 'New Orleans/Mobile', 'New York', 'Northeast',
-       'Northern New England', 'Orlando', 'Philadelphia', 'Phoenix/Tucson',
-       'Pittsburgh', 'Plains', 'Portland', 'Raleigh/Greensboro',
-       'Richmond/Norfolk', 'Roanoke', 'Sacramento', 'San Diego',
-       'San Francisco', 'Seattle', 'South Carolina', 'South Central',
-       'Southeast', 'Spokane', 'St. Louis', 'Syracuse', 'Tampa', 'Total U.S.',
-       'West', 'West Tex/New Mexico', '02', '03', '04', '05', '06', '07', '08',
-       '09', '10', '11', '12'
+'Boston', 'Buffalo/Rochester', 'California', 'Charlotte', 'Chicago',
+'Cincinnati/Dayton', 'Columbus', 'Dallas/Ft. Worth', 'Denver',
+'Detroit', 'Grand Rapids', 'Great Lakes', 'Harrisburg/Scranton',
+'Hartford/Springfield', 'Houston', 'Indianapolis', 'Jacksonville',
+'Las Vegas', 'Los Angeles', 'Louisville', 'Miami/Ft. Lauderdale',
+'Midsouth', 'Nashville', 'New Orleans/Mobile', 'New York', 'Northeast',
+'Northern New England', 'Orlando', 'Philadelphia', 'Phoenix/Tucson',
+'Pittsburgh', 'Plains', 'Portland', 'Raleigh/Greensboro',
+'Richmond/Norfolk', 'Roanoke', 'Sacramento', 'San Diego',
+'San Francisco', 'Seattle', 'South Carolina', 'South Central',
+'Southeast', 'Spokane', 'St. Louis', 'Syracuse', 'Tampa', 'Total U.S.',
+'West', 'West Tex/New Mexico', '02', '03', '04', '05', '06', '07', '08',
+'09', '10', '11', '12'
 
 
 
 """
+
+# Machine Learning Predictions Route
+# methods = "POST" is how get the input that the user input in the UI
 @app.route('/makePredictions', methods=['POST'])
 def predictions():
+    # post data = user input. form is a tag in the html with the method post
     post_data = request.form 
-    #load the model:
+    #load the model: (using pickle)
+    # Previously, we need to save the model in the notebook.
     filename = 'finalized_model.sav'
     model = pickle.load(open(filename, 'rb'))
-    
+
+    #### define the columns names to input the data to the model.
+    # We can get the columns used in the model by X_test.columns
     columns = ['total_volume', 'year', 
     # 'Albany', # Avoid perfect multicollinearity for all dummy variables notebook cell:19
     'Atlanta', 'Baltimore/Washington',
@@ -112,14 +119,14 @@ def predictions():
     # format the volume as an integer
     data[0] = int(post_data['total_volume'])
     #Format year as integer
-    data[0] = int(post_data['year'])
-    # data[columns.index(post_data['year'])]=1
+    data[1] = int(post_data['year'])
     
     # Set the column requested as True
     data[columns.index(post_data['region'])]=1
     data[columns.index(post_data['month'])]=1
 
     # input the the data to the model
+    # here we are inputting the data to the model as a numpy array. 
     predictions = model.predict(np.array(data).reshape(1,-1))
 
     #round the predictions to get the needed format
